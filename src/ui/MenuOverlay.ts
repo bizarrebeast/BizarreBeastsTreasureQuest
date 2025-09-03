@@ -95,25 +95,21 @@ export class MenuOverlay {
     // Divider line after toggles
     const divider2 = this.createDivider(20)
     
-    // Add Wallet Button for dgen1 version only
-    let walletBtn = null;
-    const isDgen1 = this.scene.registry.get('isDgen1') || window.location.port === '3001';
-    if (isDgen1) {
-      console.log('💰 Creating wallet button for dgen1')
-      walletBtn = this.createButton(
-        0, 70,  // Moved down to account for toggles
-        '💰 CONNECT WALLET',
-        () => this.handleWalletConnect(),
-        0x6366f1 // Ethereum blue/purple
-      )
-      walletBtn.setName('walletButton')
-    }
+    // DGEN1 ONLY - Always show wallet button
+    console.log('💰 Creating wallet button for dgen1')
+    const walletBtn = this.createButton(
+      0, 70,  // Moved down to account for toggles
+      '💰 CONNECT WALLET',
+      () => this.handleWalletConnect(),
+      0x6366f1 // Ethereum blue/purple
+    )
+    walletBtn.setName('walletButton')
     
     // BizarreBeasts info (moved down to avoid blocking toggles)
-    const bizarreInfo = this.createBizarreInfo(isDgen1 ? 145 : 80)  // Added 25px padding after wallet button for better spacing
+    const bizarreInfo = this.createBizarreInfo(145)  // DGEN1 fixed position
     
     // Divider line before resume button
-    const divider3 = this.createDivider(isDgen1 ? 200 : 140)  // Adjusted for new layout
+    const divider3 = this.createDivider(200)  // DGEN1 fixed position
     
     // Resume button (positioned at bottom of menu)
     // CHECK: Make sure we're not creating duplicate buttons
@@ -122,21 +118,21 @@ export class MenuOverlay {
     }
     
     const resumeBtn = this.createButton(
-      0, isDgen1 ? 240 : 180,  // Adjusted for new layout
+      0, 240,  // DGEN1 fixed position
       'RESUME GAME',
       () => this.close(),
       0x32CD32 // Keep green for resume
     )
     resumeBtn.setName('resumeButton')
-    console.log('📌 Created Resume button at Y=' + (isDgen1 ? 240 : 180))
+    console.log('📌 Created Resume button at Y=240')
     
     console.log('📍 FINAL Button Positions:', {
       instructions: -180,
       soundToggle: -80,
       musicToggle: -30,
-      wallet: isDgen1 ? 70 : 'N/A',
-      bizarreInfo: isDgen1 ? 120 : 60,
-      resumeButton: isDgen1 ? 240 : 180
+      wallet: 70,
+      bizarreInfo: 145,
+      resumeButton: 240
     })
     
     // Add all elements to container
@@ -161,11 +157,8 @@ export class MenuOverlay {
       resumeBtn: resumeBtn ? resumeBtn.y : 'null'
     });
     
-    if (walletBtn) {
-      elements.push(walletBtn);
-    }
-    
     elements.push(
+      walletBtn,  // DGEN1 - wallet button always included
       bizarreInfo,
       divider3,
       resumeBtn
@@ -196,9 +189,9 @@ export class MenuOverlay {
     const panel = this.scene.add.graphics()
     
     // Draw purple panel with border - centered relative to container
-    // Adjust width for narrow portrait mode (450px) vs square modes (720px/800px)
+    // DGEN1 ONLY - Panel width for 720x720 square mode
     const cameraWidth = this.scene.cameras.main.width;
-    const panelWidth = Math.min(cameraWidth <= 500 ? 380 : 400, cameraWidth - 40)
+    const panelWidth = Math.min(400, cameraWidth - 40)
     // Increased panel height to accommodate all elements (was 500, now 600)
     const panelHeight = Math.min(600, this.scene.cameras.main.height - 40)
     const panelX = -panelWidth / 2
@@ -231,9 +224,9 @@ export class MenuOverlay {
     const container = this.scene.add.container(x, y)
     
     // Use a rectangle game object instead of graphics for better hit detection
-    // Adjust button width for narrow portrait mode
+    // DGEN1 ONLY - Button width for 720x720 square mode
     const cameraWidth = this.scene.cameras.main.width;
-    const buttonWidth = cameraWidth <= 500 ? 320 : 340
+    const buttonWidth = 340
     const buttonHeight = 50
     
     // Create visual background rectangle
@@ -861,7 +854,7 @@ export class MenuOverlay {
         relativePos: `(${Math.round(relativeX)}, ${Math.round(relativeY)})`,
         cameraSize: `${cameraWidth}x${camera.height}`,
         cameraScroll: `(${Math.round(camera.scrollX)}, ${Math.round(camera.scrollY)})`,
-        version: 'REGULAR (450x800)'
+        version: 'DGEN1 (720x720)'
       })
     } else {
       console.log('🎯 Manual hit test at:', {
@@ -872,7 +865,7 @@ export class MenuOverlay {
     }
     
     // Check toggles FIRST before buttons to prioritize them
-    const buttonHalfWidth = cameraWidth <= 500 ? 160 : 170;  // Narrower hit area for portrait mode
+    const buttonHalfWidth = 170;  // DGEN1 standard hit area for 720x720
     
     // Log what we're checking for hits
     if (isRegularVersion) {
