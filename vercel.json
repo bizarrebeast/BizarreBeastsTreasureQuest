@@ -1,0 +1,10 @@
+{
+  "buildCommand": "npm run build:dgen1",
+  "outputDirectory": "dist-dgen1",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index-dgen1.html"
+    }
+  ]
+}
