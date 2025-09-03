@@ -208,6 +208,17 @@ export class Web3Manager {
         display: none !important;
       }
       
+      /* Position wallet display box 10px down and 10px left from default */
+      w3m-button,
+      w3m-account-button,
+      w3m-connect-button,
+      appkit-button,
+      appkit-account-button,
+      appkit-connect-button {
+        top: 10px !important;  /* Move down 10px */
+        right: 10px !important; /* Move left 10px (from right edge) */
+      }
+      
       /* Show the buttons after game starts (will be toggled via class) */
       body.game-started w3m-button,
       body.game-started w3m-account-button,

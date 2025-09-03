@@ -110,7 +110,7 @@ export class MenuOverlay {
     }
     
     // BizarreBeasts info (moved down to avoid blocking toggles)
-    const bizarreInfo = this.createBizarreInfo(isDgen1 ? 120 : 80)  // Moved down from 60 to 80 to avoid blocking music toggle
+    const bizarreInfo = this.createBizarreInfo(isDgen1 ? 145 : 80)  // Added 25px padding after wallet button for better spacing
     
     // Divider line before resume button
     const divider3 = this.createDivider(isDgen1 ? 200 : 140)  // Adjusted for new layout
@@ -414,43 +414,73 @@ export class MenuOverlay {
   private createBizarreInfo(y: number): Phaser.GameObjects.Container {
     const container = this.scene.add.container(0, y)
     
-    // Project name
-    const projectName = this.scene.add.text(0, 0, 'BizarreBeasts ($BB)', {
+    // Create custom button with all info inside
+    const buttonContainer = this.scene.add.container(0, 0)
+    
+    // Match wallet button width - for dgen1 (720px), use 340px
+    const buttonWidth = 340  // Same as wallet button in dgen1
+    const buttonHeight = 70
+    
+    // Pink background rectangle
+    const bgRect = this.scene.add.rectangle(0, 0, buttonWidth, buttonHeight, 0xFF69B4, 0.9)  // Pink color
+    bgRect.setStrokeStyle(2, 0xFF1493)  // Darker pink border
+    bgRect.setInteractive({ useHandCursor: true })
+    
+    // Store expected position for bounds validation
+    bgRect.setData('expectedY', y)
+    bgRect.setData('buttonType', 'bizarreSwap')
+    
+    // BizarreBeasts title - YELLOW
+    const title = this.scene.add.text(0, -20, 'BizarreBeasts ($BB)', {
       fontSize: '12px',
       fontFamily: '"Press Start 2P", system-ui',
-      color: '#FFD700' // Yellow text
+      color: '#FFD700'  // Yellow text
     })
-    projectName.setOrigin(0.5)
+    title.setOrigin(0.5)
     
-    // Contract address - now 20% smaller than before
-    const contractLabel = this.scene.add.text(0, 25, 'CA:', {
-      fontSize: '8px',  // Reduced by 20% from 10px
-      fontFamily: '"Press Start 2P", system-ui',
-      color: '#FFD700'
-    })
-    contractLabel.setOrigin(0.5)
-    
-    // Address with same font size as CA: label
-    const contractAddress = this.scene.add.text(0, 45, 
+    // Full CA address - YELLOW
+    const caText = this.scene.add.text(0, 0, 
       '0x0520bf1d3cEE163407aDA79109333aB1599b4004', {
-      fontSize: '8px',  // Reduced by 20% from 10px
+      fontSize: '7px',
       fontFamily: '"Press Start 2P", system-ui',
-      color: '#FFD700',
-      wordWrap: { width: 380 }
+      color: '#FFD700',  // Yellow text
+      wordWrap: { width: buttonWidth - 20 }
     })
-    contractAddress.setOrigin(0.5)
+    caText.setOrigin(0.5)
     
-    // Creator info (adjusted to not overlap with resume button)
-    const creatorText = this.scene.add.text(0, 60, 'Created by @bizarrebeast', {
-      fontSize: '10px',
+    // Click to swap text - BRIGHT YELLOW
+    const swapText = this.scene.add.text(0, 18, 'Click to swap on Uniswap', {
+      fontSize: '8px',
+      fontFamily: '"Press Start 2P", system-ui',
+      color: '#FFFF00'  // Bright yellow for call to action
+    })
+    swapText.setOrigin(0.5)
+    
+    // Add hover effect
+    bgRect.on('pointerover', () => {
+      bgRect.setFillStyle(0xFF1493, 0.95)  // Darker pink on hover
+      bgRect.setScale(1.02)
+    })
+    
+    bgRect.on('pointerout', () => {
+      bgRect.setFillStyle(0xFF69B4, 0.9)  // Back to original pink
+      bgRect.setScale(1)
+    })
+    
+    // Remove direct click handler - manual hit test will handle this
+    // The button click is now handled in manualHitTest() method to avoid phantom clicks
+    
+    buttonContainer.add([bgRect, title, caText, swapText])
+    
+    // Creator info below the button
+    const creatorText = this.scene.add.text(0, 50, 'Created by @bizarrebeast', {
+      fontSize: '9px',
       fontFamily: '"Press Start 2P", system-ui',
       color: '#FFD700'
     })
     creatorText.setOrigin(0.5)
     
-    // Removed 'Join /bizarrebeasts' text as requested
-    
-    container.add([projectName, contractLabel, contractAddress, creatorText])
+    container.add([buttonContainer, creatorText])
     
     return container
   }
@@ -562,6 +592,11 @@ export class MenuOverlay {
     
     this.isOpen = true
     this.container.setVisible(true)
+    
+    // Play menu open sound if sound effects are enabled
+    if (this.soundEffectsEnabled) {
+      this.scene.sound.play('menu-toggle', { volume: 0.5 })
+    }
     
     // Update SDK indicator
     const indicators = this.container.list.filter(obj => 
@@ -939,6 +974,22 @@ export class MenuOverlay {
       if (Math.abs(relativeX - walletBtnX) < buttonHalfWidth && Math.abs(relativeY - walletBtnY) < 25) {
         console.log('✅ Wallet button hit!')
         this.handleWalletConnect()
+        return  // Early return to prevent checking other buttons
+      }
+      
+      // Check BizarreBeasts swap button
+      const bbBtnX = 0  // Relative to container center
+      const bbBtnY = 145  // Relative to container center (with padding)
+      const bbButtonWidth = 170  // Half of 340px width (for dgen1's wider screen)
+      const bbButtonHeight = 35  // Half of 70px height
+      if (Math.abs(relativeX - bbBtnX) < bbButtonWidth && Math.abs(relativeY - bbBtnY) < bbButtonHeight) {
+        console.log('✅ BizarreBeasts button hit!')
+        // Token address for BIZARRE on Base chain
+        const tokenAddress = '0x0520bf1d3cEE163407aDA79109333aB1599b4004'
+        // Open Uniswap interface on Base chain for swapping ETH to BIZARRE
+        const swapUrl = `https://app.uniswap.org/swap?outputCurrency=${tokenAddress}&chain=base`
+        window.open(swapUrl, '_blank')
+        return  // Early return
       }
     }
   }
@@ -1098,6 +1149,12 @@ export class MenuOverlay {
     }
     
     console.log('🍔 Closing menu overlay')
+    
+    // Play menu close sound if sound effects are enabled
+    if (this.soundEffectsEnabled) {
+      this.scene.sound.play('menu-toggle', { volume: 0.5 })
+    }
+    
     // Set flag immediately
     this.isOpen = false
     

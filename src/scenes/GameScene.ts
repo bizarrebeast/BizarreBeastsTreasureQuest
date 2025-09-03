@@ -599,7 +599,7 @@ export class GameScene extends Phaser.Scene {
     // Level/UI sounds
     this.load.audio('continue-button', 'https://lqy3lriiybxcejon.public.blob.vercel-storage.com/d281be5d-2111-4a73-afb0-19b2a18c80a9/level%20complete%20continue%20button%20sfx-tKmarJUBWs3rQJhPDsv2IYj5oc8p5j.wav?V3lH')
     this.load.audio('door-open', 'https://lqy3lriiybxcejon.public.blob.vercel-storage.com/d281be5d-2111-4a73-afb0-19b2a18c80a9/door%20open%20sfx-LqGIt2ZSLGjCz0lSbuC6F6yusdC97e.wav?hCxN')
-    this.load.audio('menu-toggle', 'https://lqy3lriiybxcejon.public.blob.vercel-storage.com/d281be5d-2111-4a73-afb0-19b2a18c80a9/menu%20open%20and%20close-nUqXoXI4Du6a4mBgJmOcJZuJkGXAa2.wav?EOlm')
+    this.load.audio('menu-toggle', 'https://lqy3lriiybxcejon.public.blob.vercel-storage.com/d281be5d-2111-4a73-afb0-19b2a18c80a9/menu%20sound-uBdZpD8zUrdGkuqw7jw0j9339NP2wC.wav?rHPB')
     
     // Player damage sounds
     this.load.audio('spike-hit', 'https://lqy3lriiybxcejon.public.blob.vercel-storage.com/d281be5d-2111-4a73-afb0-19b2a18c80a9/player%20hits%20spikes%20sfx-Pt2SxNCgCXtyIz2jiBS3AYiCvYrp8X.wav?IM9a')
@@ -1581,7 +1581,7 @@ export class GameScene extends Phaser.Scene {
     const screenWidth = this.cameras.main.width
     
     // First, create the image that will fill the background (zoomed in)
-    const hudBgImage = this.add.image(screenWidth / 2, 40 + 48 + 4, 'hud-bg-200')  // Shifted down 4px (was 5px)
+    const hudBgImage = this.add.image(screenWidth / 2, 10 + 48 + 4, 'hud-bg-200')  // Changed from 40px to 10px from top
     // Scale up the image by 1.6x to zoom in and crop edges
     hudBgImage.setDisplaySize((screenWidth - 16) * 1.6, 96 * 1.6)  // 60% larger to zoom in
     hudBgImage.setOrigin(0.5, 0.5)  // Keep centered
@@ -1591,7 +1591,7 @@ export class GameScene extends Phaser.Scene {
     // Create a mask for the rounded rectangle shape
     const maskGraphics = this.add.graphics()
     maskGraphics.fillStyle(0xffffff)
-    maskGraphics.fillRoundedRect(8, 40, screenWidth - 16, 96, 12)
+    maskGraphics.fillRoundedRect(8, 10, screenWidth - 16, 96, 12)
     maskGraphics.setScrollFactor(0)
     
     // Apply the mask to clip the image to the rounded rectangle shape
@@ -1601,18 +1601,18 @@ export class GameScene extends Phaser.Scene {
     // Now create the border on top
     const hudBorder = this.add.graphics()
     hudBorder.lineStyle(2, 0x7b1fa2, 1.0) // Slightly lighter purple border
-    hudBorder.strokeRoundedRect(8, 40, screenWidth - 16, 96, 12) // Just the border stroke
+    hudBorder.strokeRoundedRect(8, 10, screenWidth - 16, 96, 12) // Changed from 40px to 10px
     hudBorder.setDepth(99)
     hudBorder.setScrollFactor(0)
     
     // LEFT SIDE: Lives, Crystals, Level
     // Lives display with heart crystal icon (left side, row 1)
-    this.livesIcon = this.add.image(30, 65, 'heart-crystal')
+    this.livesIcon = this.add.image(30, 35, 'heart-crystal')  // Shifted up 30px (was 65)
     this.livesIcon.setDisplaySize(16, 16)
     this.livesIcon.setDepth(100)
     this.livesIcon.setScrollFactor(0)
     
-    this.livesText = this.add.text(45, 65, 'x3', {
+    this.livesText = this.add.text(45, 35, 'x3', {  // Shifted up 30px (was 65)
       fontSize: '14px',
       color: '#ff69b4',  // Pink color to match heart crystal theme
       fontFamily: '"Press Start 2P", system-ui',
@@ -1653,12 +1653,12 @@ export class GameScene extends Phaser.Scene {
     this.comboText.setScrollFactor(0)
     
     // Crystal counter with new crystal HUD icon (left side, row 2)
-    const crystalIcon = this.add.image(30, 88, 'crystal-hud-icon')
+    const crystalIcon = this.add.image(30, 58, 'crystal-hud-icon')  // Shifted up 30px (was 88)
     crystalIcon.setDisplaySize(16, 16)
     crystalIcon.setDepth(100)
     crystalIcon.setScrollFactor(0)
     
-    this.coinCounterText = this.add.text(45, 88, '0/150', {
+    this.coinCounterText = this.add.text(45, 58, '0/150', {  // Shifted up 30px (was 88)
       fontSize: '14px',
       color: '#ffd700',  // Gold color for crystals
       fontFamily: '"Press Start 2P", system-ui',
@@ -1676,7 +1676,7 @@ export class GameScene extends Phaser.Scene {
     this.coinCounterText.setScrollFactor(0)
     
     // Level counter with new door HUD icon (left side, row 3)
-    const doorIcon = this.add.image(30, 111, 'door-hud-icon')
+    const doorIcon = this.add.image(30, 81, 'door-hud-icon')  // Shifted up 30px (was 111)
     doorIcon.setDisplaySize(16, 16)
     doorIcon.setDepth(100)
     doorIcon.setScrollFactor(0)
@@ -1687,7 +1687,7 @@ export class GameScene extends Phaser.Scene {
                              levelForHUD >= 51 ? `${levelForHUD}` : 
                              `${levelForHUD}`
     
-    this.levelText = this.add.text(45, 111, levelDisplayText, {
+    this.levelText = this.add.text(45, 81, levelDisplayText, {  // Shifted up 30px (was 111)
       fontSize: '14px',
       color: '#9acf07',  // Same green as hamburger menu
       fontFamily: '"Press Start 2P", system-ui',
@@ -1706,7 +1706,7 @@ export class GameScene extends Phaser.Scene {
     
     // CENTER: Score and Invincibility Timer
     // Score display (center, top)
-    this.scoreText = this.add.text(screenWidth / 2, 55, '0', {
+    this.scoreText = this.add.text(screenWidth / 2, 25, '0', {  // Shifted up 30px (was 55)
       fontSize: '19px',
       color: '#ffd700',  // Gold color
       fontFamily: '"Press Start 2P", system-ui',
@@ -1725,7 +1725,7 @@ export class GameScene extends Phaser.Scene {
     this.comboText.setScrollFactor(0)
     
     // Timer container - all 4 timers centered as a group under score
-    const timerY = 105 // 50px below score
+    const timerY = 75 // Shifted up 30px (was 105)
     const timerSpacing = 45 // Space between timers (reduced for 4 timers)
     const totalWidth = timerSpacing * 3 // 3 gaps between 4 timers
     const startX = screenWidth / 2 - totalWidth / 2
@@ -1782,7 +1782,7 @@ export class GameScene extends Phaser.Scene {
     this.cursedTealOrbTimerMask.setScrollFactor(0)
     
     // RIGHT SIDE: Hamburger menu
-    this.hamburgerMenuButton = this.add.text(screenWidth - 30, 78, '☰', {  // Moved up 10px from 88 to 78
+    this.hamburgerMenuButton = this.add.text(screenWidth - 30, 48, '☰', {  // Shifted up 30px (was 78)
       fontSize: '42px',  // Increased by 10px from 32px
       color: '#9acf07',  // Bright green color
       fontFamily: '"Press Start 2P", system-ui',
