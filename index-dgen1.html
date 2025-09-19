@@ -192,5 +192,17 @@
     
     <!-- Main Game Entry (dgen1 version) -->
     <script type="module" src="/src/main.dgen1.ts"></script>
+
+    <!-- Vercel Analytics -->
+    <script>
+      window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
+
+    <!-- Alternative: Using the npm package -->
+    <script type="module">
+      import { inject } from '@vercel/analytics';
+      inject();
+    </script>
   </body>
 </html>
