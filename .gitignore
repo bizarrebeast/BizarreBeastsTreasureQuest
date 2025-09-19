@@ -31,4 +31,13 @@ pnpm-debug.log*
 *.ntvs*
 *.njsproj
 *.sln
-*.sw? 
+*.sw?
+
+# Development documentation (keep only essential docs)
+*.md
+!README.md
+!LICENSE
+!PLAYERS_GUIDE.md
+
+# Keep dist-dgen1 for deployment
+!dist-dgen1/ 
