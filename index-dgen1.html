@@ -24,30 +24,48 @@
         padding: 0;
         display: flex;
         justify-content: center;
-        align-items: center;
+        align-items: flex-start; /* Changed from center to flex-start for scrolling */
         width: 100vw;
-        height: 100vh;
+        min-height: 100vh; /* Changed from height to min-height */
         background: #2e2348; /* Purple theme background */
         font-family: "Press Start 2P", system-ui;
-        overflow: hidden;
-        touch-action: none; /* Prevent scroll/zoom on mobile */
+        overflow-y: auto; /* Allow vertical scrolling */
+        overflow-x: hidden; /* Prevent horizontal scrolling */
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
       }
-      
+
+      /* Add padding to allow scrolling past the game */
+      body.web-browser {
+        padding-top: 50px; /* Space at top to trigger scroll */
+        padding-bottom: 50px; /* Space at bottom */
+      }
+
+      /* When in app mode (no scroll needed) */
+      body.app-mode {
+        height: 100vh;
+        overflow: hidden;
+        touch-action: none;
+        align-items: center;
+        padding: 0;
+      }
+
       /* Square container for 720x720 */
       .game-frame {
         position: relative;
         width: 720px;
         height: 720px;
-        max-width: 100vw;
-        max-height: 100vh;
+        max-width: min(100vw, 100vh);
+        max-height: min(100vw, 100vh);
         aspect-ratio: 1/1; /* Square aspect ratio */
         display: flex;
         justify-content: center;
         align-items: center;
         background: #000;
         box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); /* Subtle glow */
+        margin: auto; /* Center horizontally */
+        flex-shrink: 0; /* Prevent shrinking */
       }
-      
+
       .game-container {
         position: relative;
         width: 720px;
@@ -59,14 +77,14 @@
         justify-content: center;
         align-items: center;
       }
-      
+
       #gameCanvas {
         width: 720px !important;
         height: 720px !important;
         max-width: 100%;
         max-height: 100%;
         display: block;
-        touch-action: none;
+        touch-action: manipulation; /* Allow tap but control other gestures */
         image-rendering: pixelated; /* Crisp pixel art */
         image-rendering: -moz-crisp-edges;
         image-rendering: crisp-edges;
@@ -111,13 +129,50 @@
     
     <!-- Web3 Detection Script -->
     <script>
+      // Detect if running as an app or web browser
+      function detectEnvironment() {
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                            window.navigator.standalone ||
+                            document.referrer.includes('android-app://');
+
+        // Check if inside an iframe (common for dGEN1 apps)
+        const isInIframe = window !== window.parent;
+
+        // Check URL parameters for app indicators
+        const urlParams = new URLSearchParams(window.location.search);
+        const isAppParam = urlParams.get('app') === 'true' || urlParams.get('mode') === 'app';
+
+        // Determine if in app mode
+        const isAppMode = isStandalone || isInIframe || isAppParam;
+
+        // Apply appropriate class to body
+        if (isAppMode) {
+          document.body.classList.add('app-mode');
+          console.log('🎮 Running in app mode - scroll disabled');
+        } else {
+          document.body.classList.add('web-browser');
+          console.log('🌐 Running in web browser - scroll enabled to hide URL bar');
+
+          // Auto-scroll a tiny bit to hide the URL bar on mobile browsers
+          setTimeout(() => {
+            window.scrollTo(0, 1);
+          }, 100);
+        }
+      }
+
+      // Run environment detection immediately
+      detectEnvironment();
+
       window.addEventListener('load', () => {
+        // Re-check environment on load
+        detectEnvironment();
+
         // Check for Web3 wallet
         if (typeof window.ethereum !== 'undefined') {
           console.log('Web3 wallet detected');
           document.getElementById('walletStatus').className = 'wallet-status disconnected';
           document.getElementById('walletStatus').innerText = 'Wallet Available';
-          
+
           // Listen for account changes
           window.ethereum.on('accountsChanged', (accounts) => {
             if (accounts.length > 0) {
